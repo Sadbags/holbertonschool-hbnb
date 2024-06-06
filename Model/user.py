@@ -1,16 +1,14 @@
-import uuid
-from datetime import datetime
 from place import Place
 from review import Review
+from basemodel import BaseModel
 
-class User:
-    def __init__(self, email, first_name, last_name):
-        self.id = uuid.uuid4()
+class User(BaseModel):
+    def __init__(self, email, password, first_name, last_name,**kwargs):
+        super().__init__(**kwargs)
         self.email = email
+        self.password = password
         self.first_name = first_name
         self.last_name = last_name
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
         self.places = []
         self.reviews = []
 
