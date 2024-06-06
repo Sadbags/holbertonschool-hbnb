@@ -1,7 +1,8 @@
-from basemodel import BaseModel
-class city:
-    def __init__(self,name, country, **kwargs):
-        super().__init__(**kwargs)
+import uuid
+
+class City:
+    def __init__(self, name, country):
+        self.id = uuid.uuid4()
         self.name = name
         self.country = country
         self.places = []
