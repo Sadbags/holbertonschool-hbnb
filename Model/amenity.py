@@ -1,8 +1,8 @@
-import uuid
+from basemodel import BaseModel
 
-class Amenity:
-    def __init__(self, name, Description, Type):
-        self.id = uuid.uuid4()
+class Amenity(BaseModel):
+    def __init__(self, name, Description, Type, **kwargs):
+        super().__init__(**kwargs)
         self.name = name
         self.Description = Description
         self.Type = Type

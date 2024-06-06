@@ -1,9 +1,12 @@
 from basemodel import BaseModel
-class city:
-    def __init__(self,name, country, **kwargs):
+
+
+class City(BaseModel):
+    def __init__(self, name, country, places, city, **kwargs):
         super().__init__(**kwargs)
         self.name = name
         self.country = country
+        self.city = city
         self.places = []
 
     def add_place(self, place):

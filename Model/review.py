@@ -1,12 +1,10 @@
-import uuid
-from datetime import datetime
+from basemodel import BaseModel
 
-class Review:
-    def __init__(self, rating, content, author, place):
-        sel.id = uuid.uuid4()
+class Review(BaseModel):
+    def __init__(self, rating, content, author, place, **kwargs):
+        super().__init__(**kwargs)
         self.rating = rating
         self.content = content
         self.author = author
         self.place = place
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+
