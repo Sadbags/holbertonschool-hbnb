@@ -6,7 +6,7 @@ class Place(BaseModel):
         self.name = name
         self.location = location
         self.owner = owner
-        self.descripton = description
+        self.description = description
         self.address = address
         self.city = city
         self.price_per_night = price_per_night
