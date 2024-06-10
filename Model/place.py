@@ -1,21 +1,20 @@
-import uuid
-from datetime import datetime
+from basemodel import BaseModel
 
-class Place:
-    def __init__(self, name, location, owner):
-        self.id = uuid.uuid4()
+class Place(BaseModel):
+    def __init__(self, name, location, owner, description="", address="", city=None, price_per_night=0, **kwargs):
+        super().__init__(**kwargs)
         self.name = name
         self.location = location
         self.owner = owner
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+        self.descripton = description
+        self.address = address
+        self.city = city
+        self.price_per_night = price_per_night
         self.reviews = []
         self.amenities = []
 
     def add_review(self, review):
         self.reviews.append(review)
-        self.updated_at = datetime.now()
 
     def add_amenities(self, amenity):
         self.amenities.append(amenity)
-        self.updated_at = datetime.now()
