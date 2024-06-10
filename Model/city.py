@@ -7,7 +7,7 @@ class City(BaseModel):
         self.name = name
         self.country = country
         self.city = city
-        self.places = []
+        self.places = places
 
     def add_place(self, place):
         self.places.append(place)
