@@ -1,5 +1,3 @@
-
-
 class Country():
     def __init__(self, name, area_code):
         self.name = name

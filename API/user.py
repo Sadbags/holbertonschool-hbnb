@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from user import User
+from Model.user import User
 from Persistence.DataManager import DataManager
 import re
 
