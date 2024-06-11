@@ -27,6 +27,8 @@ def create_place():
         description=data.get('description', ''),
         address=data.get('address', ''),
         city=city,
+        latitude=data.get('latitude', ''),
+        longitude=data.get('longitude', ''),
         price_per_night=data.get('price_per_night', 0)
     )
 
