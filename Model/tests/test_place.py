@@ -23,6 +23,8 @@ class TestPlace(unittest.TestCase):
         self.assertEqual(place.description, 'Una bella casa frente a la playa con una vista espectacular')
         self.assertEqual(place.address, '2168 Park Blvd')
         self.assertEqual(place.city, 'San Juan')
+        self.assertEqual(place.latitude, "")
+        self.assertEqual(place.longitude, "")
         self.assertEqual(place.price_per_night, 150)
         self.assertEqual(place.reviews, [])
         self.assertEqual(place.amenities, [])

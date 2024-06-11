@@ -1,7 +1,7 @@
 from basemodel import BaseModel
 
 class Place(BaseModel):
-    def __init__(self, name, location, owner, description="", address="", city=None, price_per_night=0, **kwargs):
+    def __init__(self, name, location, owner, description="", address="", city=None, latitude="", longitude="", price_per_night=0, **kwargs):
         super().__init__(**kwargs)
         self.name = name
         self.location = location
@@ -9,6 +9,8 @@ class Place(BaseModel):
         self.description = description
         self.address = address
         self.city = city
+        self.latitude = latitude
+        self.longitude = longitude
         self.price_per_night = price_per_night
         self.reviews = []
         self.amenities = []
