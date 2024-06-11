@@ -97,3 +97,4 @@ def delete_place(place_id):
         return jsonify({'error': 'Place not found'}), 404
     data_manager.delete(place_id, Place)
     return '', 204
+
