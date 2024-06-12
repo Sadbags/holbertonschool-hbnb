@@ -1,6 +1,6 @@
 import json
 import os
-from PersistenceManager import IPersistenceManager
+from Persistence import IPersistenceManager
 
 class DataManager(IPersistenceManager):
     def __init__(self, directory):

@@ -1,7 +1,9 @@
 from basemodel import BaseModel
 
 class Place(BaseModel):
+    """  Place class that inherits from BaseModel. Represents a rental place with various attributes. """
     def __init__(self, name, location, owner, description="", address="", city=None, latitude="", longitude="", price_per_night=0, **kwargs):
+        """ Initializes the Place with the given attributes. """
         super().__init__(**kwargs)
         self.name = name
         self.location = location
@@ -16,7 +18,9 @@ class Place(BaseModel):
         self.amenities = []
 
     def add_review(self, review):
+        """  Adds a review to the list of reviews for the place. """
         self.reviews.append(review)
 
     def add_amenities(self, amenity):
+        """ Adds an amenity to the list of amenities for the place. """
         self.amenities.append(amenity)
