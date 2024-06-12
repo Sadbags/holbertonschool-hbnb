@@ -27,6 +27,8 @@ def create_place():
         description=data.get('description', ''),
         address=data.get('address', ''),
         city=city,
+        latitude=data.get('latitude', ''),
+        longitude=data.get('longitude', ''),
         price_per_night=data.get('price_per_night', 0)
     )
 
@@ -95,3 +97,4 @@ def delete_place(place_id):
         return jsonify({'error': 'Place not found'}), 404
     data_manager.delete(place_id, Place)
     return '', 204
+
