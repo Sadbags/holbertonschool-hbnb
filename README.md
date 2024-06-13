@@ -13,25 +13,25 @@ This project is interpreted/tested on Ubuntu 14.04 LTS using python3 (version 3.
 
 
 Classes inherited from Base Model:
-* [amenity.py](/models/amenity.py)
-* [city.py](/models/city.py)
-* [place.py](/models/place.py)
-* [review.py](/models/review.py)
-* [state.py](/models/state.py)
-* [user.py](/models/user.py)
+* [amenity.py](/model/amenity.py)
+* [city.py](/model/city.py)
+* [place.py](/model/place.py)
+* [review.py](/model/review.py)
+* [state.py](/model/state.py)
+* [user.py](/model/user.py)
 
 
 ## Models file Structure
 
 |File|Description|Recommendations
 |---|---|---
-|[amenity.py](./models/engine/amenity.py)|Amenity class| Inherits from BaseModel and contains specific public attributes
-|[basemodel.py](./models/engine/base_model.py)| Base Model class|  Defines all common attributes/methods for other classes sach as id, datetime
-|[city.py](./models/engine/city.py)|City Class| Inherits from BaseModel and contains specific public attributes
-|[place.py](./models/engine/place.py)|Place Class| Inherits from BaseModel and contains specific public attributes
-|[review.py](./models/engine/review.py)|Review Class| Inherits from BaseModel and contains specific public attributes
-|[country.py](./models/engine/country.py)|Country Class| Inherits from BaseModel and contains specific public attributes
-|[user.py](./models/engine/user.py)|User Class| Inherits from BaseModel and contains specific public attributes
+|[amenity.py](./model/amenity.py)|Amenity class| Inherits from BaseModel and contains specific public attributes
+|[basemodel.py](./model/base_model.py)| Base Model class|  Defines all common attributes/methods for other classes sach as id, datetime
+|[city.py](./model/city.py)|City Class| Inherits from BaseModel and contains specific public attributes
+|[place.py](./model/place.py)|Place Class| Inherits from BaseModel and contains specific public attributes
+|[review.py](./model/review.py)|Review Class| Inherits from BaseModel and contains specific public attributes
+|[country.py](./model/country.py)|Country Class| Inherits from BaseModel and contains specific public attributes
+|[user.py](./model/user.py)|User Class| Inherits from BaseModel and contains specific public attributes
 
 # Importance of Testing Files
 Testing files are crucial because they operate with:
@@ -53,12 +53,12 @@ Both types of tests are essential to ensure the quality and reliability of the a
 
 
 # Test Files
-* [test_amenety.py](/models/test/test_amenety.py)
-* [test_city.py](/models/test/test_city.py)
-* [test_place.py](/models/test/test_place.py)
-* [test_review.py](/models/test/test_review.py)
-* [test_state.py](/models/test/test_state.py)
-* [test_user.py](/models/test/test_user.py)
+* [test_amenety.py](/model/test/test_amenety.py)
+* [test_city.py](/model/test/test_city.py)
+* [test_place.py](/model/test/test_place.py)
+* [test_review.py](/model/test/test_review.py)
+* [test_state.py](/model/test/test_state.py)
+* [test_user.py](/model/test/test_user.py)
 
 
 ## Run Tests
