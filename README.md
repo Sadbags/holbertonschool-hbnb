@@ -1,10 +1,12 @@
-# HBNB (Airbnb Clone)
+# HBNB Evolution Project
 
 This repository includes the first stage of Holberton School project that consist on creating a simple and limited version of the Airbnb website. A command interpreter is created in this segment to manage objects for the AirBnB(HBnB) website.
 
 ## Environment
 This project is interpreted/tested on Ubuntu 14.04 LTS using python3 (version 3.4.3)
 
+
+# Files
 
 #### `models/` directory contains classes used for this project:
 [base_model.py](/models/base_model.py) - The BaseModel class from which future classes will be derived
@@ -18,78 +20,55 @@ Classes inherited from Base Model:
 * [state.py](/models/state.py)
 * [user.py](/models/user.py)
 
-#### `/models/engine` directory contains File Storage class that handles JASON serialization and deserialization :
-[file_storage.py](/models/engine/file_storage.py) - serializes instances to a JSON file & deserializes back to instances
-* `def all(self)` - returns the dictionary __objects
-* `def new(self, obj)` - sets in __objects the obj with key <obj class name>.id
-* `def save(self)` - serializes __objects to the JSON file (path: __file_path)
-* ` def reload(self)` -  deserializes the JSON file to __objects
 
-#### `/tests` directory contains all unit test cases for this project:
-[/test_models/test_base_model.py](/tests/test_models/test_base_model.py) - Contains the TestBaseModel and TestBaseModelDocs classes
-TestBaseModelDocs class:
-* `def setUpClass(cls)`- Set up for the doc tests
-* `def test_pep8_conformance_base_model(self)` - Test that models/base_model.py conforms to PEP8
-* `def test_pep8_conformance_test_base_model(self)` - Test that tests/test_models/test_base_model.py conforms to PEP8
-* `def test_bm_module_docstring(self)` - Test for the base_model.py module docstring
-* `def test_bm_class_docstring(self)` - Test for the BaseModel class docstring
-* `def test_bm_func_docstrings(self)` - Test for the presence of docstrings in BaseModel methods
+## Models file Structure
 
-TestBaseModel class:
-* `def test_is_base_model(self)` - Test that the instatiation of a BaseModel works
-* `def test_created_at_instantiation(self)` - Test created_at is a pub. instance attribute of type datetime
-* `def test_updated_at_instantiation(self)` - Test updated_at is a pub. instance attribute of type datetime
-* `def test_diff_datetime_objs(self)` - Test that two BaseModel instances have different datetime objects
+|File|Description|Recommendations
+|---|---|---
+|[amenity.py](./models/engine/amenity.py)|Amenity class| Inherits from BaseModel and contains specific public attributes
+|[basemodel.py](./models/engine/base_model.py)| Base Model class|  Defines all common attributes/methods for other classes sach as id, datetime
+|[city.py](./models/engine/city.py)|City Class| Inherits from BaseModel and contains specific public attributes
+|[place.py](./models/engine/place.py)|Place Class| Inherits from BaseModel and contains specific public attributes
+|[review.py](./models/engine/review.py)|Review Class| Inherits from BaseModel and contains specific public attributes
+|[country.py](./models/engine/country.py)|Country Class| Inherits from BaseModel and contains specific public attributes
+|[user.py](./models/engine/user.py)|User Class| Inherits from BaseModel and contains specific public attributes
 
-[/test_models/test_amenity.py](/tests/test_models/test_amenity.py) - Contains the TestAmenityDocs class:
-* `def setUpClass(cls)` - Set up for the doc tests
-* `def test_pep8_conformance_amenity(self)` - Test that models/amenity.py conforms to PEP8
-* `def test_pep8_conformance_test_amenity(self)` - Test that tests/test_models/test_amenity.py conforms to PEP8
-* `def test_amenity_module_docstring(self)` - Test for the amenity.py module docstring
-* `def test_amenity_class_docstring(self)` - Test for the Amenity class docstring
+# Importance of Testing Files
+Testing files are crucial because they operate with:
 
-[/test_models/test_city.py](/tests/test_models/test_city.py) - Contains the TestCityDocs class:
-* `def setUpClass(cls)` - Set up for the doc tests
-* `def test_pep8_conformance_city(self)` - Test that models/city.py conforms to PEP8
-* `def test_pep8_conformance_test_city(self)` - Test that tests/test_models/test_city.py conforms to PEP8
-* `def test_city_module_docstring(self)` - Test for the city.py module docstring
-* `def test_city_class_docstring(self)` - Test for the City class docstring
+## Unit Tests:
 
-[/test_models/test_file_storage.py](/tests/test_models/test_file_storage.py) - Contains the TestFileStorageDocs class:
-* `def setUpClass(cls)` - Set up for the doc tests
-* `def test_pep8_conformance_file_storage(self)` - Test that models/file_storage.py conforms to PEP8
-* `def test_pep8_conformance_test_file_storage(self)` - Test that tests/test_models/test_file_storage.py conforms to PEP8
-* `def test_file_storage_module_docstring(self)` - Test for the file_storage.py module docstring
-* `def test_file_storage_class_docstring(self)` - Test for the FileStorage class docstring
+- They verify that each component functions in isolation.
+- They detect errors in the logic of individual methods and functions.
+- They facilitate development by providing immediate feedback on code correctness.
 
-[/test_models/test_place.py](/tests/test_models/test_place.py) - Contains the TestPlaceDoc class:
-* `def setUpClass(cls)` - Set up for the doc tests
-* `def test_pep8_conformance_place(self)` - Test that models/place.py conforms to PEP8.
-* `def test_pep8_conformance_test_place(self)` - Test that tests/test_models/test_place.py conforms to PEP8.
-* `def test_place_module_docstring(self)` - Test for the place.py module docstring
-* `def test_place_class_docstring(self)` - Test for the Place class docstring
+## Integration Tests:
 
-[/test_models/test_review.py](/tests/test_models/test_review.py) - Contains the TestReviewDocs class:
-* `def setUpClass(cls)` - Set up for the doc tests
-* `def test_pep8_conformance_review(self)` - Test that models/review.py conforms to PEP8
-* `def test_pep8_conformance_test_review(self)` - Test that tests/test_models/test_review.py conforms to PEP8
-* `def test_review_module_docstring(self)` - Test for the review.py module docstring
-* `def test_review_class_docstring(self)` - Test for the Review class docstring
+- They verify that multiple components work together.
+- They detect issues in the interaction between modules, such as errors in handling HTTP requests.
+- They ensure that the application responds correctly to user interactions and that API endpoints function as expected.
 
-[/test_models/state.py](/tests/test_models/test_state.py) - Contains the TestStateDocs class:
-* `def setUpClass(cls)` - Set up for the doc tests
-* `def test_pep8_conformance_state(self)` - Test that models/state.py conforms to PEP8
-* `def test_pep8_conformance_test_state(self)` - Test that tests/test_models/test_state.py conforms to PEP8
-* `def test_state_module_docstring(self)` - Test for the state.py module docstring
-* `def test_state_class_docstring(self)` - Test for the State class docstring
+Both types of tests are essential to ensure the quality and reliability of the application, allowing developers to identify and fix errors before the code reaches production.
 
-[/test_models/user.py](/tests/test_models/test_user.py) - Contains the TestUserDocs class:
-* `def setUpClass(cls)` - Set up for the doc tests
-* `def test_pep8_conformance_user(self)` - Test that models/user.py conforms to PEP8
-* `def test_pep8_conformance_test_user(self)` - Test that tests/test_models/test_user.py conforms to PEP8
-* `def test_user_module_docstring(self)` - Test for the user.py module docstring
-* `def test_user_class_docstring(self)` - Test for the User class docstring
 
+
+# Test Files
+* [test_amenety.py](/models/test/test_amenety.py)
+* [test_city.py](/models/test/test_city.py)
+* [test_place.py](/models/test/test_place.py)
+* [test_review.py](/models/test/test_review.py)
+* [test_state.py](/models/test/test_state.py)
+* [test_user.py](/models/test/test_user.py)
+
+
+## Run Tests
+To run the model and API tests, use the following commands:
+
+```
+python tests/test_place_model.py
+python tests/test_place_api.py
+```
+* 
 ## Dockerization
 
 ### `Dockerfile`
@@ -98,8 +77,6 @@ TestBaseModel class:
 FROM python:3.9-alpine
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
 ENV PORT 8000
 
 # Create and set the working directory
@@ -110,10 +87,30 @@ RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
 
 # Copy the requirements file
 COPY requirements.txt /app/
+```
 
+## Build the Docker Image
+```
+docker build -t flask-app .
+```
+
+## Run the Docker Container
+```
+docker run -d -p 5000:5000 -v $(pwd)/data:/app/data --name flask-app-container flask-app
+```
+
+## Access the Application
+Accede a la aplicación en http://localhost:5000.
+
+## Configure Environment Variables
+To override the port when running the container:
+```
+docker run -d -p 8080:8080 -v $(pwd)/data:/app/data -e PORT=8080 --name flask-app-container flask-app
+```
 
 ## Authors
 Glorisabel Rivera - [Github](https://github.com/glorisabelriv)   
 Bryan Garcia - [Github](https://github.com/Sadbags)
+
 ## License
-Public Domain. No copy write protection. 
+Public Domain. No copy write protection.
