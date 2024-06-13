@@ -65,8 +65,7 @@ Both types of tests are essential to ensure the quality and reliability of the a
 To run the model and API tests, use the following commands:
 
 ```
-python tests/test_place_model.py
-python tests/test_place_api.py
+python3 -m unittest Model.tests.test_place
 ```
 * 
 ## Dockerization
