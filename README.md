@@ -9,7 +9,7 @@ This project is interpreted/tested on Ubuntu 14.04 LTS using python3 (version 3.
 # Files
 
 #### `models/` directory contains classes used for this project:
-[base_model.py](/models/base_model.py) - The BaseModel class from which future classes will be derived
+[basemodel.py](/models/basemodel.py) - The BaseModel class from which future classes will be derived
 
 
 Classes inherited from Base Model:
