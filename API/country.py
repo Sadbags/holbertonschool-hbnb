@@ -26,5 +26,6 @@ def get_cities_by_country(country_id):
     if country is None:
         return jsonify({'error': 'Country not found'}), 404
 
-    cities = [obj.__dict for obj in data_manager.storage.objects.values() if isinstance(obj, City) and obj.country == country]
+
+    cities = [obj.__dict__ for obj in data_manager.storage.objects.values() if isinstance(obj, City) and obj.country == country]
     return jsonify(cities)
