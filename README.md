@@ -96,16 +96,17 @@ docker build -t flask-app .
 
 ## Run the Docker Container
 ```
-docker run -d -p 5000:5000 -v $(pwd)/data:/app/data --name flask-app-container flask-app
+docker run -d -p 8000:8000 --name myapp_container -v /Users/glorisabelriverarodriguez/Desktop/myapp_data:/app/
+data myapp:latest
 ```
 
 ## Access the Application
-Accede a la aplicación en http://localhost:5000.
+Accede a la aplicación en http://localhost:8000.
 
 ## Configure Environment Variables
 To override the port when running the container:
 ```
-docker run -d -p 8080:8080 -v $(pwd)/data:/app/data -e PORT=8080 --name flask-app-container flask-app
+docker run -d -p 8000:8000 -v $(pwd)/data:/app/data -e PORT=8000 --name flask-app-container flask-app
 ```
 
 ## Authors
