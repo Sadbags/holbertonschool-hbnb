@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, abort, Blueprint
-from city import City
-from country import Country
+from Model.city import City
+from Model.country import Country
 from Persistence.DataManager import DataManager
 
 city_bp = Blueprint('city', __name__)
@@ -13,7 +13,7 @@ def create_city():
     country = next((obj for obj in data_manager.storage.objects.values() if isinstance(obj, Country) and obj.area_code == data['country_code']), None)
     if country is None:
         return jsonify({'error': 'Country not found'}), 404
-    
+
     city = City(name=data['name'], country=country)
     data_manager.save(city)
     return jsonify({'id': str(city.id)}), 201

@@ -1,33 +1,25 @@
-import json
-import os
-from Persistence.IPersistenceManager import IPersistenceManager
-class DataManager(IPersistenceManager):
-    def __init__(self, directory):
+import uuid
+
+class DataManager:
+    def __init__(self, directory=None):
         self.directory = directory
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+        self.storage = {'objects': {}}
 
-    def _get_file_path(self, entity_id, entity_type):
-        return os.path.join(self.directory, f"{entity_type}_{entity_id}.json")
+    def save(self, obj):
+        if not obj.id:
+            obj.id = str(uuid.uuid4())
+        self.storage['objects'][obj.id] = obj
 
-    def save(self, entity):
-        file_path = self._get_file_path(entity.id, type(entity).__name__)
-        with open(file_path, 'w') as f:
-            json.dump(entity.__dict__, f, default=str)
+    def get(self, obj_id, obj_type):
+        obj = self.storage['objects'].get(obj_id)
+        return obj if isinstance(obj, obj_type) else None
 
-    def get(self, entity_id, entity_type):
-        file_path = self._get_file_path(entity_id, entity_type)
-        if not os.path.exists(file_path):
-            return None
-        with open(file_path, 'r') as f:
-            data = json.load(f)
-            return data
+    def delete(self, obj_id, obj_type):
+        obj = self.storage['objects'].get(obj_id)
+        if obj and isinstance(obj, obj_type):
+            del self.storage['objects'][obj_id]
+            return True
+        return False
 
-    def update(self, entity):
-        self.save(entity)
-
-
-    def delete(self, entity_id, entity_type):
-        file_path = self._get_file_path(entity_id, entity_type)
-        if os.path.exists(file_path):
-            os.remove(file_path)
+    def update(self, obj):
+        self.storage['objects'][obj.id] = obj

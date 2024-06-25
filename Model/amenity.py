@@ -1,4 +1,4 @@
-from basemodel import BaseModel
+from Model.basemodel import BaseModel
 
 class Amenity(BaseModel):
     """ Amenety class that inherits from BaseModel """
