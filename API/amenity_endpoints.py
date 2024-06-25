@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort, Blueprint
-from amenity import Amenity
+from Model.amenity import Amenity
 from Persistence.DataManager import DataManager
 
 amenity_bp = Blueprint('amenity', __name__)

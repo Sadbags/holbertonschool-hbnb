@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
-from place import Place
-from user import User
-from city import City
-from amenity import Amenity
+from Model.place import Place
+from Model.user import User
+from Model.city import City
+from Model.amenity import Amenity
 from Persistence.DataManager import DataManager
 
 place_bp = Blueprint('place', __name__)
@@ -97,4 +97,3 @@ def delete_place(place_id):
         return jsonify({'error': 'Place not found'}), 404
     data_manager.delete(place_id, Place)
     return '', 204
-

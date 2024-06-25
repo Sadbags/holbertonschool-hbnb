@@ -1,4 +1,4 @@
-from basemodel import BaseModel
+from .basemodel import BaseModel
 
 class Place(BaseModel):
     """  Place class that inherits from BaseModel. Represents a rental place with various attributes. """
@@ -9,7 +9,7 @@ class Place(BaseModel):
         super().__init__(**kwargs)
         if self.__class__._places_hosts.get(name):
             raise ValueError("This place already has a host assigned.")
-        
+
         self.name = name
         self.location = location
         self.owner = owner
@@ -22,7 +22,6 @@ class Place(BaseModel):
         self.reviews = []
         self.amenities = []
 
-        #Asignar el anfitrión al lugar
         self.__class__._places_hosts[name] = owner
 
     def add_review(self, review):
