@@ -1,58 +1,69 @@
-from flask import Blueprint, request, jsonify, abort, Blueprint
+from flask import Blueprint, request, jsonify, abort
 from Model.amenity import Amenity
 from Persistence.DataManager import DataManager
 
 amenity_bp = Blueprint('amenity', __name__)
 data_manager = DataManager()
 
-# Ruta para crear una nueva amenidad
-@amenity_bp.route('/', methods=['POST'])
+
+@amenity_bp.route('/amenities', methods=['POST'])
 def create_amenity():
-    data = request.get_json()
-    if 'name' not in data or not data['name']:
-        return jsonify({'error': 'Name is required'}), 400
-    if next((obj for obj in data_manager.storage.objects.values() if isinstance(obj, Amenity) and obj.name == data['name']), None):
-        return jsonify({'error': 'Amenity with this name already exists'}), 409
-    amenity = Amenity(name=data['name'], Description=data.get('Description', ''), Type=data.get('Type', ''))
+    if not request.json or not 'name' in request.json:
+        abort(400, description="Missing required fields")
+
+    name = request.json['name']
+
+    existing_amenities = [amenity for amenity in data_manager.storage.get(
+        'Amenity', {}).values() if amenity.name == name]
+    if existing_amenities:
+        abort(409, description="Amenity name already exists")
+
+    amenity = Amenity(name=name)
     data_manager.save(amenity)
-    return jsonify({'id': str(amenity.id)}), 201
 
-# Ruta para obtener la lista de todas las amenidades
-@amenity_bp.route('/', methods=['GET'])
+    return jsonify(amenity.to_dict()), 201
+
+
+@amenity_bp.route('/amenities', methods=['GET'])
 def get_amenities():
-    amenities = [obj.__dict__ for obj in data_manager.storage.objects.values() if isinstance(obj, Amenity)]
-    return jsonify(amenities)
+    amenities = [amenity.to_dict()
+                 for amenity in data_manager.storage.get('Amenity', {}).values()]
+    return jsonify(amenities), 200
 
-# Ruta para obtener los detalles de una amenidad específica por su ID
-@amenity_bp.route('/<amenity_id>', methods=['GET'])
+
+@amenity_bp.route('/amenities/<amenity_id>', methods=['GET'])
 def get_amenity(amenity_id):
-    amenity = data_manager.get(amenity_id, Amenity)
-    if amenity is None:
-        return jsonify({'error': 'Amenity not found'}), 404
-    return jsonify(amenity.__dict__)
+    amenity = data_manager.get(amenity_id, 'Amenity')
+    if not amenity:
+        abort(404, description="Amenity not found")
+    return jsonify(amenity.to_dict()), 200
 
-# Ruta para actualizar la información de una amenidad existente
-@amenity_bp.route('/<amenity_id>', methods=['PUT'])
+
+@amenity_bp.route('/amenities/<amenity_id>', methods=['PUT'])
 def update_amenity(amenity_id):
-    data = request.get_json()
-    amenity = data_manager.get(amenity_id, Amenity)
-    if amenity is None:
-        return jsonify({'error': 'Amenity not found'}), 404
-    if 'name' in data and not data['name']:
-        return jsonify({'error': 'Name cannot be empty'}), 400
-    if 'name' in data and next((obj for obj in data_manager.storage.objects.values() if isinstance(obj, Amenity) and obj.name == data['name']), None):
-        return jsonify({'error': 'Amenity with this name already exists'}), 409
-    for key, value in data.items():
-        setattr(amenity, key, value)
-    amenity.save()
-    data_manager.update(amenity)
-    return jsonify({'id': str(amenity.id)}), 200
+    amenity = data_manager.get(amenity_id, 'Amenity')
+    if not amenity:
+        abort(404, description="Amenity not found")
 
-# Ruta para eliminar una amenidad específica por su ID
-@amenity_bp.route('/<amenity_id>', methods=['DELETE'])
+    if not request.json:
+        abort(400, description="Missing required fields")
+
+    name = request.json.get('name', amenity.name)
+
+    existing_amenities = [a for a in data_manager.storage.get(
+        'Amenity', {}).values() if a.name == name and a.id != amenity_id]
+    if existing_amenities:
+        abort(409, description="Amenity name already exists")
+
+    amenity.name = name
+    data_manager.update(amenity)
+    return jsonify(amenity.to_dict()), 200
+
+
+@amenity_bp.route('/amenities/<amenity_id>', methods=['DELETE'])
 def delete_amenity(amenity_id):
-    amenity = data_manager.get(amenity_id, Amenity)
-    if amenity is None:
-        return jsonify({'error': 'Amenity not found'}), 404
-    data_manager.delete(amenity_id, Amenity)
+    amenity = data_manager.get(amenity_id, 'Amenity')
+    if not amenity:
+        abort(404, description="Amenity not found")
+    data_manager.delete(amenity_id, 'Amenity')
     return '', 204

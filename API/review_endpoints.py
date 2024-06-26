@@ -1,79 +1,75 @@
 from flask import Blueprint, request, jsonify, abort
 from Model.review import Review
-from Model.user import User
-from Model.place import Place
 from Persistence.DataManager import DataManager
-import re
 
 review_bp = Blueprint('review_bp', __name__)
 data_manager = DataManager()
 
-# Helper function to validate rating
-def validate_rating(rating):
-    return isinstance(rating, int) and 1 <= rating <= 5
 
-# Route to create a new review
-@review_bp.route('/', methods=['POST'])
-def create_review():
-    data = request.get_json()
+@review_bp.route('/places/<place_id>/reviews', methods=['POST'])
+def create_review(place_id):
+    if not request.json or not all(key in request.json for key in ('user_id', 'rating', 'comment')):
+        abort(400, description="Missing required fields")
 
-    author_id = data.get('author_id')
-    place_id = data.get('place_id')
-    rating = data.get('rating')
-    content = data.get('content')
+    user_id = request.json['user_id']
+    rating = request.json['rating']
+    comment = request.json['comment']
 
-    if not validate_rating(rating):
-        return jsonify({'error': 'Rating must be an integer between 1 and 5'}), 400
+    if not (1 <= rating <= 5):
+        abort(400, description="Rating must be between 1 and 5")
 
-    author = data_manager.get(author_id, User)
-    place = data_manager.get(place_id, Place)
-
-    if not author or not place:
-        return jsonify({'error': 'Invalid author or place ID'}), 400
-
-    if author == place.host:
-        return jsonify({'error': 'The host cannot review their own place'}), 400
-
-    review = Review(rating=rating, content=content, author=author, place=place)
+    review = Review(place_id=place_id, user_id=user_id,
+                    rating=rating, comment=comment)
     data_manager.save(review)
-    return jsonify({'id': str(review.id)}), 201
 
-# Route to get the list of all reviews
-@review_bp.route('/', methods=['GET'])
-def get_reviews():
-    reviews = [obj.__dict__ for obj in data_manager.storage.objects.values() if isinstance(obj, Review)]
-    return jsonify(reviews)
+    return jsonify(review.to_dict()), 201
 
-# Route to get the details of a specific review by ID
-@review_bp.route('/<review_id>', methods=['GET'])
+
+@review_bp.route('/users/<user_id>/reviews', methods=['GET'])
+def get_user_reviews(user_id):
+    reviews = [review.to_dict() for review in data_manager.storage.get(
+        'Review', {}).values() if review.user_id == user_id]
+    return jsonify(reviews), 200
+
+
+@review_bp.route('/places/<place_id>/reviews', methods=['GET'])
+def get_place_reviews(place_id):
+    reviews = [review.to_dict() for review in data_manager.storage.get(
+        'Review', {}).values() if review.place_id == place_id]
+    return jsonify(reviews), 200
+
+
+@review_bp.route('/reviews/<review_id>', methods=['GET'])
 def get_review(review_id):
-    review = data_manager.get(review_id, Review)
-    if review is None:
-        return jsonify({'error': 'Review not found'}), 404
-    return jsonify(review.__dict__)
+    review = data_manager.get(review_id, 'Review')
+    if not review:
+        abort(404, description="Review not found")
+    return jsonify(review.to_dict()), 200
 
-# Route to update an existing review's information
-@review_bp.route('/<review_id>', methods=['PUT'])
+
+@review_bp.route('/reviews/<review_id>', methods=['PUT'])
 def update_review(review_id):
-    data = request.get_json()
-    review = data_manager.get(review_id, Review)
-    if review is None:
-        return jsonify({'error': 'Review not found'}), 404
+    review = data_manager.get(review_id, 'Review')
+    if not review:
+        abort(404, description="Review not found")
 
-    if 'rating' in data and not validate_rating(data['rating']):
-        return jsonify({'error': 'Rating must be an integer between 1 and 5'}), 400
+    if not request.json:
+        abort(400, description="Missing required fields")
 
-    for key, value in data.items():
-        setattr(review, key, value)
-    review.save()
+    review.rating = request.json.get('rating', review.rating)
+    review.comment = request.json.get('comment', review.comment)
+
+    if not (1 <= review.rating <= 5):
+        abort(400, description="Rating must be between 1 and 5")
+
     data_manager.update(review)
-    return jsonify({'id': str(review.id)}), 200
+    return jsonify(review.to_dict()), 200
 
-# Route to delete a specific review by ID
-@review_bp.route('/<review_id>', methods=['DELETE'])
+
+@review_bp.route('/reviews/<review_id>', methods=['DELETE'])
 def delete_review(review_id):
-    review = data_manager.get(review_id, Review)
-    if review is None:
-        return jsonify({'error': 'Review not found'}), 404
-    data_manager.delete(review_id, Review)
+    review = data_manager.get(review_id, 'Review')
+    if not review:
+        abort(404, description="Review not found")
+    data_manager.delete(review_id, 'Review')
     return '', 204

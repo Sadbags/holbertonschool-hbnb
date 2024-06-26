@@ -2,15 +2,11 @@ from Model.basemodel import BaseModel
 
 class Amenity(BaseModel):
     """ Amenety class that inherits from BaseModel """
-    def __init__(self, name, Description, type, **kwargs):
+    def __init__(self, name, **kwargs):
         """ Initializes the Amenety class with its attributes """
         super().__init__(**kwargs)
         self.name = name
-        self.Description = Description
-        self.type = type
-        self.places = []
 
-    def add_place(self, place):
-        """ adds place to the list of places associated with the amenety """
-        if place not in self.places:
-            self.places.append(place)
+
+    def __str__(self):
+    	return f"[Amenity] ({self.id}) {self.to_dict()}"

@@ -1,99 +1,87 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, abort
 from Model.place import Place
-from Model.user import User
-from Model.city import City
-from Model.amenity import Amenity
 from Persistence.DataManager import DataManager
 
-place_bp = Blueprint('place', __name__)
+
+place_bp = Blueprint('place_bp', __name__)
 data_manager = DataManager()
 
-# Ruta para crear un nuevo lugar
-@place_bp.route('/', methods=['POST'])
+
+@place_bp.route('/places', methods=['POST'])
 def create_place():
-    data = request.get_json()
-    user = data_manager.get(data['host_id'], User)
-    if user is None:
-        return jsonify({'error': 'Host not found'}), 404
+    if not request.json:
+        abort(400, description="Missing required fields")
 
-    city = data_manager.get(data['city_id'], City)
-    if city is None:
-        return jsonify({'error': 'City not found'}), 404
-
+    data = request.json
     place = Place(
-        name=data['name'],
-        location=data['location'],
-        owner=user,
-        description=data.get('description', ''),
-        address=data.get('address', ''),
-        city=city,
-        latitude=data.get('latitude', ''),
-        longitude=data.get('longitude', ''),
-        price_per_night=data.get('price_per_night', 0)
+        name=data.get('name'),
+        description=data.get('description'),
+        address=data.get('address'),
+        city_id=data.get('city_id'),
+        latitude=data.get('latitude'),
+        longitude=data.get('longitude'),
+        host_id=data.get('host_id'),
+        number_of_rooms=data.get('number_of_rooms'),
+        number_of_bathrooms=data.get('number_of_bathrooms'),
+        price_per_night=data.get('price_per_night'),
+        max_guests=data.get('max_guests'),
+        amenity_ids=data.get('amenity_ids')
     )
 
-    for amenity_id in data.get('amenity_ids', []):
-        amenity = data_manager.get(amenity_id, Amenity)
-        if amenity:
-            place.add_amenity(amenity)
-
     data_manager.save(place)
-    return jsonify({'id': str(place.id)}), 201
+    return jsonify(place.to_dict()), 201
 
-# Ruta para obtener la lista de todos los lugares
-@place_bp.route('/', methods=['GET'])
+
+@place_bp.route('/places', methods=['GET'])
 def get_places():
-    places = [obj.__dict__ for obj in data_manager.storage.objects.values() if isinstance(obj, Place)]
-    return jsonify(places)
+    places = [place.to_dict()
+              for place in data_manager.storage.get('Place', {}).values()]
+    return jsonify(places), 200
 
-# Ruta para obtener los detalles de un lugar específico por su ID
-@place_bp.route('/<place_id>', methods=['GET'])
+
+@place_bp.route('/places/<place_id>', methods=['GET'])
 def get_place(place_id):
-    place = data_manager.get(place_id, Place)
-    if place is None:
-        return jsonify({'error': 'Place not found'}), 404
-    return jsonify(place.__dict__)
+    place = data_manager.get(place_id, 'Place')
+    if not place:
+        abort(404, description="Place not found")
+    return jsonify(place.to_dict()), 200
 
-# Ruta para actualizar la información de un lugar existente
-@place_bp.route('/<place_id>', methods=['PUT'])
+
+@place_bp.route('/places/<place_id>', methods=['PUT'])
 def update_place(place_id):
-    data = request.get_json()
-    place = data_manager.get(place_id, Place)
-    if place is None:
-        return jsonify({'error': 'Place not found'}), 404
+    place = data_manager.get(place_id, 'Place')
+    if not place:
+        abort(404, description="Place not found")
 
-    if 'host_id' in data:
-        user = data_manager.get(data['host_id'], User)
-        if user is None:
-            return jsonify({'error': 'Host not found'}), 404
-        place.owner = user
+    if not request.json:
+        abort(400, description="Missing required fields")
 
+    data = request.json
+    place.name = data.get('name', place.name)
+    place.description = data.get('description', place.description)
+    place.address = data.get('address', place.address)
     if 'city_id' in data:
-        city = data_manager.get(data['city_id'], City)
-        if city is None:
-            return jsonify({'error': 'City not found'}), 404
-        place.city = city
+        place.city_id = data['city_id']
+        if not data_manager.get(place.city_id, 'City'):
+            abort(400, description="Invalid city_id")
+    place.latitude = data.get('latitude', place.latitude)
+    place.longitude = data.get('longitude', place.longitude)
+    place.host_id = data.get('host_id', place.host_id)
+    place.number_of_rooms = data.get('number_of_rooms', place.number_of_rooms)
+    place.number_of_bathrooms = data.get(
+        'number_of_bathrooms', place.number_of_bathrooms)
+    place.price_per_night = data.get('price_per_night', place.price_per_night)
+    place.max_guests = data.get('max_guests', place.max_guests)
+    place.amenity_ids = data.get('amenity_ids', place.amenity_ids)
 
-    for key, value in data.items():
-        if key != 'amenity_ids':
-            setattr(place, key, value)
-
-    if 'amenity_ids' in data:
-        place.amenities = []
-        for amenity_id in data['amenity_ids']:
-            amenity = data_manager.get(amenity_id, Amenity)
-            if amenity:
-                place.add_amenity(amenity)
-
-    place.save()
     data_manager.update(place)
-    return jsonify({'id': str(place.id)}), 200
+    return jsonify(place.to_dict()), 200
 
-# Ruta para eliminar un lugar específico por su ID
-@place_bp.route('/<place_id>', methods=['DELETE'])
+
+@place_bp.route('/places/<place_id>', methods=['DELETE'])
 def delete_place(place_id):
-    place = data_manager.get(place_id, Place)
-    if place is None:
-        return jsonify({'error': 'Place not found'}), 404
-    data_manager.delete(place_id, Place)
+    place = data_manager.get(place_id, 'Place')
+    if not place:
+        abort(404, description="Place not found")
+    data_manager.delete(place_id, 'Place')
     return '', 204

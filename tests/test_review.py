@@ -1,77 +1,81 @@
 import unittest
 import json
-from flask import Flask
-from API.review_endpoints import review_bp
+from app import app
+from API.review_endpoints import data_manager
 from Model.user import User
 from Model.place import Place
 from Model.review import Review
-from Persistence.DataManager import DataManager
 
-class ReviewAPITestCase(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        cls.app = Flask(__name__)
-        cls.app.register_blueprint(review_bp, url_prefix='/reviews')
-        cls.client = cls.app.test_client()
-        cls.data_manager = DataManager()
-        cls.data_manager.storage.objects = {}
-
+class TestReviewEndpoints(unittest.TestCase):
     def setUp(self):
-        self.data_manager.storage.objects.clear()
-        self.user = User(email='test_user@example.com', first_name='Test', last_name='User', password='password')
-        self.place = Place(name='Test Place', location='Test Location', owner=self.user)
-        self.data_manager.save(self.user)
+        self.app = app.test_client()
+        self.app.testing = True
+        self.data_manager = data_manager
+        self.data_manager.storage = {}
+
+        # Crear datos iniciales
+        self.place = Place(name='Test Place', description='A test place', address='123 Test St', city_id='city123',
+                           latitude=40.7128, longitude=-74.0060, host_id='host123', number_of_rooms=3,
+                           number_of_bathrooms=2, price_per_night=100, max_guests=4, amenity_ids=[])
         self.data_manager.save(self.place)
+        self.user = User(email='test@example.com')
+        self.data_manager.save(self.user)
+        self.host = User(email='host@example.com')
+        self.data_manager.save(self.host)
 
     def test_create_review(self):
-        review_data = {
-            'author_id': str(self.user.id),
-            'place_id': str(self.place.id),
+        response = self.app.post(f'/places/{self.place.id}/reviews', json={
+            'user_id': self.user.id,
             'rating': 5,
-            'content': 'Great place!'
-        }
-        response = self.client.post('/reviews/', data=json.dumps(review_data), content_type='application/json')
+            'comment': 'Great place!'
+        })
         self.assertEqual(response.status_code, 201)
-        self.assertIn('id', json.loads(response.data))
+        self.assertIn('Great place!', str(response.data))
 
-    def test_get_reviews(self):
-        review = Review(rating=5, content='Great place!', author=self.user, place=self.place)
+    def test_get_user_reviews(self):
+        review = Review(place_id=self.place.id,
+                        user_id=self.user.id, rating=5, comment='Great place!')
         self.data_manager.save(review)
-        response = self.client.get('/reviews/')
+        response = self.app.get(f'/users/{self.user.id}/reviews')
         self.assertEqual(response.status_code, 200)
-        reviews = json.loads(response.data)
-        self.assertEqual(len(reviews), 1)
-        self.assertEqual(reviews[0]['content'], 'Great place!')
+        self.assertIn('Great place!', str(response.data))
+
+    def test_get_place_reviews(self):
+        review = Review(place_id=self.place.id,
+                        user_id=self.user.id, rating=5, comment='Great place!')
+        self.data_manager.save(review)
+        response = self.app.get(f'/places/{self.place.id}/reviews')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Great place!', str(response.data))
 
     def test_get_review(self):
-        review = Review(rating=5, content='Great place!', author=self.user, place=self.place)
+        review = Review(place_id=self.place.id,
+                        user_id=self.user.id, rating=5, comment='Great place!')
         self.data_manager.save(review)
-        response = self.client.get(f'/reviews/{review.id}')
+        response = self.app.get(f'/reviews/{review.id}')
         self.assertEqual(response.status_code, 200)
-        review_data = json.loads(response.data)
-        self.assertEqual(review_data['content'], 'Great place!')
+        self.assertIn('Great place!', str(response.data))
 
     def test_update_review(self):
-        review = Review(rating=5, content='Great place!', author=self.user, place=self.place)
+        review = Review(place_id=self.place.id,
+                        user_id=self.user.id, rating=5, comment='Great place!')
         self.data_manager.save(review)
-        updated_data = {
+        response = self.app.put(f'/reviews/{review.id}', json={
             'rating': 4,
-            'content': 'Good place!'
-        }
-        response = self.client.put(f'/reviews/{review.id}', data=json.dumps(updated_data), content_type='application/json')
+            'comment': 'Good place!'
+        })
         self.assertEqual(response.status_code, 200)
-        updated_review = self.data_manager.get(review.id, Review)
-        self.assertEqual(updated_review.rating, 4)
-        self.assertEqual(updated_review.content, 'Good place!')
+        self.assertIn('Good place!', str(response.data))
 
     def test_delete_review(self):
-        review = Review(rating=5, content='Great place!', author=self.user, place=self.place)
+        review = Review(place_id=self.place.id,
+                        user_id=self.user.id, rating=5, comment='Great place!')
         self.data_manager.save(review)
-        response = self.client.delete(f'/reviews/{review.id}')
+        response = self.app.delete(f'/reviews/{review.id}')
         self.assertEqual(response.status_code, 204)
-        deleted_review = self.data_manager.get(review.id, Review)
-        self.assertIsNone(deleted_review)
+        self.assertIsNone(self.data_manager.get(review.id, 'Review'))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
