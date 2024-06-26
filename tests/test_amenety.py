@@ -1,35 +1,53 @@
 import unittest
-import sys
-import os
-
-# Get the directory that contains the current script.
-current_directory = os.path.dirname(os.path.abspath(__file__))
-
-# Get the parent directory.
-parent_directory = os.path.dirname(current_directory)
-
-# Add the parent directory to the Python path.
-sys.path.append(parent_directory)
-
+import json
 from Model.amenity import Amenity
-from Model.place import Place  # Assuming Place is defined similarly as before
+from API.amenity_endpoints import data_manager
+from app import app
 
-class TestAmenity(unittest.TestCase):
+class TestAmenityEndpoints(unittest.TestCase):
+    def setUp(self):
+        self.app = app.test_client()
+        self.app.testing = True
+        self.data_manager = data_manager
+        self.data_manager.storage = {}
+
     def test_create_amenity(self):
-        # Test creating a new amenity
-        amenity = Amenity(name='Pool', Description='Swimming Pool', type='Indoor')
-        self.assertEqual(amenity.name, 'Pool')
-        self.assertEqual(amenity.Description, 'Swimming Pool')
-        self.assertEqual(amenity.type, 'Indoor')
-        self.assertEqual(amenity.places, [])
+        response = self.app.post('/amenities', json={
+            'name': 'Wi-Fi'
+        })
+        self.assertEqual(response.status_code, 201)
+        self.assertIn('Wi-Fi', str(response.data))
 
-    def test_add_place(self):
-        # Test adding a place to the amenity
-        amenity = Amenity(name='Pool', Description='Swimming Pool', type='Indoor')
-        place = Place(name='El Beach House', location='Condado', owner='Glori')
-        amenity.add_place(place)
-        self.assertIn(place, amenity.places)
-        self.assertEqual(len(amenity.places), 1)
+    def test_get_amenities(self):
+        amenity = Amenity(name='Wi-Fi')
+        self.data_manager.save(amenity)
+        response = self.app.get('/amenities')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Wi-Fi', str(response.data))
 
-if __name__ == '__main__':
+    def test_get_amenity(self):
+        amenity = Amenity(name='Wi-Fi')
+        self.data_manager.save(amenity)
+        response = self.app.get(f'/amenities/{amenity.id}')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Wi-Fi', str(response.data))
+
+    def test_update_amenity(self):
+        amenity = Amenity(name='Wi-Fi')
+        self.data_manager.save(amenity)
+        response = self.app.put(f'/amenities/{amenity.id}', json={
+            'name': 'High-speed Wi-Fi'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('High-speed Wi-Fi', str(response.data))
+
+    def test_delete_amenity(self):
+        amenity = Amenity(name='Wi-Fi')
+        self.data_manager.save(amenity)
+        response = self.app.delete(f'/amenities/{amenity.id}')
+        self.assertEqual(response.status_code, 204)
+        self.assertIsNone(self.data_manager.get(amenity.id, 'Amenity'))
+
+
+if __name__ == "__main__":
     unittest.main()

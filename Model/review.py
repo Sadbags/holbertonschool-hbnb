@@ -1,12 +1,12 @@
 from Model.basemodel import BaseModel
 
 class Review(BaseModel):
-    def __init__(self, rating, content, author, place, **kwargs):
+    def __init__(self, place_id, user_id, rating, comment, **kwargs):
         super().__init__(**kwargs)
-        if author == place.owner:
-            raise ValueError("The host cannot review their own place")
+        self.place_id = place_id
         self.rating = rating
-        self.content = content
-        self.author = author
-        self.place = place
-        place.add_review(self)
+        self.comment = comment
+        self.user_id = user_id
+
+    def __str__(self):
+        return f"[Review] ({self.id}) {self.to_dict()}"

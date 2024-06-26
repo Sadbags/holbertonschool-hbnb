@@ -1,61 +1,71 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, abort
 from Model.user import User
 from Persistence.DataManager import DataManager
-import re
+
 
 user_bp = Blueprint('user_bp', __name__)
 data_manager = DataManager()
 
-def validate_email(email):
-    return re.match(r"[^@]+@[^@]+\.[^@]+", email)
 
-@user_bp.route('/', methods=['POST'])
+@user_bp.route('/users', methods=['POST'])
 def create_user():
-    data = request.get_json()
-    if not validate_email(data.get('email')):
-        return jsonify({'error': 'Invalid email format'}), 400
-    if not data.get('first_name') or not data.get('last_name'):
-        return jsonify({'error': 'First name and last name are required'}), 400
-    if next((obj for obj in data_manager.storage['objects'].values() if isinstance(obj, User) and obj.email == data['email']), None):
-        return jsonify({'error': 'Email already exists'}), 409
-    user = User(email=data['email'], password=data['password'], first_name=data['first_name'], last_name=data['last_name'])
+    if not request.json or not 'email' in request.json:
+        abort(400, description="Missing requirement fields")
+
+    email = request.json['email']
+    first_name = request.json.get('first_name', '')
+    last_name = request.json.get('last_name', '')
+
+    if '@' not in email:
+        abort(400, description="Invalid email format")
+
+    existing_users = [user for user in data_manager.storage.get(
+		'User', {}).values() if user.email == email]
+    if existing_users:
+        abort(409, description="Email already exists")
+
+
+    user = User(email=email, first_name=first_name, last_name=last_name)
     data_manager.save(user)
-    return jsonify({'id': str(user.id)}), 201
 
-@user_bp.route('/', methods=['GET'])
+    return jsonify(user.to_dict()), 201
+
+
+@user_bp.route('/users', methods=['GET'])
 def get_users():
-    users = [obj.__dict__ for obj in data_manager.storage['objects'].values() if isinstance(obj, User)]
-    return jsonify(users)
+    users = [user.to_dict()
+             for user in data_manager.storage.get('User', {}).values()]
+    return jsonify(users), 200
 
-@user_bp.route('/<user_id>', methods=['GET'])
+@user_bp.route('/users/<user_id>', methods=['GET'])
 def get_user(user_id):
-    user = data_manager.get(user_id, User)
+    user = data_manager.get(user_id, 'User')
     if user is None:
-        return jsonify({'error': 'User not found'}), 404
-    return jsonify(user.__dict__)
+        abort(404, description="User not found")
+    return jsonify(user.to_dict()), 200
 
-@user_bp.route('/<user_id>', methods=['PUT'])
+
+@user_bp.route('/users/<user_id>', methods=['PUT'])
 def update_user(user_id):
-    data = request.get_json()
-    user = data_manager.get(user_id, User)
+    user = data_manager.get(user_id, 'User')
     if user is None:
-        return jsonify({'error': 'User not found'}), 404
-    if 'email' in data and not validate_email(data['email']):
-        return jsonify({'error': 'Invalid email format'}), 400
-    if 'first_name' in data and not data['first_name']:
-        return jsonify({'error': 'First name cannot be empty'}), 400
-    if 'last_name' in data and not data['last_name']:
-        return jsonify({'error': 'Last name cannot be empty'}), 400
-    for key, value in data.items():
-        setattr(user, key, value)
-    user.save()
-    data_manager.update(user)
-    return jsonify({'id': str(user.id)}), 200
+        abort(404, description='User not found')
 
-@user_bp.route('/<user_id>', methods=['DELETE'])
+    if not request.json:
+        abort(400, description="Missing required fields")
+
+    user.email = request.json.get('email', user.email)
+    user.first_name = request.json.get('first_name', user.first_name)
+    user.last_name = request.json.get('last_name', user.last_name)
+
+    data_manager.update(user)
+    return jsonify(user.to_dict()), 200
+
+
+@user_bp.route('/users/<user_id>', methods=['DELETE'])
 def delete_user(user_id):
-    user = data_manager.get(user_id, User)
+    user = data_manager.get(user_id, 'User')
     if user is None:
-        return jsonify({'error': 'User not found'}), 404
-    data_manager.delete(user_id, User)
+        abort(404, description="User not found")
+    data_manager.delete(user_id, 'User')
     return '', 204

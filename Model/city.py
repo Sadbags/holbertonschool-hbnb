@@ -3,13 +3,11 @@ from Model.basemodel import BaseModel
 
 class City(BaseModel):
     """ City class that inherits from BaseModel """
-    def __init__(self, name, country, **kwargs):
+    def __init__(self, name, country_code, **kwargs):
         """ Initializes the city with name, country and additional attributes """
         super().__init__(**kwargs)
         self.name = name
-        self.country = country
-        self.places = []
+        self.country_code = country_code
 
-    def add_place(self, place):
-        """ Adds a place to the list of places associated with the city class """
-        self.places.append(place)
+    def __str__(self):
+        return f"[City] ({self.id}) {self.to_dict()}"
