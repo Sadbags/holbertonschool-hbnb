@@ -3,11 +3,11 @@ from Model.place import Place
 from Persistence.DataManager import DataManager
 
 
-place_bp = Blueprint('place_bp', __name__)
+place_blueprint = Blueprint('place_blueprint', __name__)
 data_manager = DataManager()
 
 
-@place_bp.route('/places', methods=['POST'])
+@place_blueprint.route('/places', methods=['POST'])
 def create_place():
     if not request.json:
         abort(400, description="Missing required fields")
@@ -32,14 +32,14 @@ def create_place():
     return jsonify(place.to_dict()), 201
 
 
-@place_bp.route('/places', methods=['GET'])
+@place_blueprint.route('/places', methods=['GET'])
 def get_places():
     places = [place.to_dict()
               for place in data_manager.storage.get('Place', {}).values()]
     return jsonify(places), 200
 
 
-@place_bp.route('/places/<place_id>', methods=['GET'])
+@place_blueprint.route('/places/<place_id>', methods=['GET'])
 def get_place(place_id):
     place = data_manager.get(place_id, 'Place')
     if not place:
@@ -47,7 +47,7 @@ def get_place(place_id):
     return jsonify(place.to_dict()), 200
 
 
-@place_bp.route('/places/<place_id>', methods=['PUT'])
+@place_blueprint.route('/places/<place_id>', methods=['PUT'])
 def update_place(place_id):
     place = data_manager.get(place_id, 'Place')
     if not place:
@@ -78,7 +78,7 @@ def update_place(place_id):
     return jsonify(place.to_dict()), 200
 
 
-@place_bp.route('/places/<place_id>', methods=['DELETE'])
+@place_blueprint.route('/places/<place_id>', methods=['DELETE'])
 def delete_place(place_id):
     place = data_manager.get(place_id, 'Place')
     if not place:

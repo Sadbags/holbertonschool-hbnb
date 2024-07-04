@@ -1,5 +1,6 @@
 from Persistence.IPersistenceManager import IPersistenceManager
 import json
+from database import db
 
 
 class DataManager(IPersistenceManager):
@@ -7,13 +8,12 @@ class DataManager(IPersistenceManager):
         self.storage = {}
         self.load_countries()
 
-
     def load_countries(self):
         try:
             with open('countries.json', 'r') as f:
                 countries = json.load(f)
             self.storage['Country'] = {
-				country['code']: country for country in countries}
+                country['code']: country for country in countries}
         except FileNotFoundError:
             self.storage['Country'] = {}
 

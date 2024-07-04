@@ -2,11 +2,11 @@ from flask import Blueprint, request, jsonify, abort
 from Model.amenity import Amenity
 from Persistence.DataManager import DataManager
 
-amenity_bp = Blueprint('amenity', __name__)
+amenity_blueprint = Blueprint('amenity_blueprint', __name__)
 data_manager = DataManager()
 
 
-@amenity_bp.route('/amenities', methods=['POST'])
+@amenity_blueprint.route('/amenities', methods=['POST'])
 def create_amenity():
     if not request.json or not 'name' in request.json:
         abort(400, description="Missing required fields")
@@ -24,14 +24,14 @@ def create_amenity():
     return jsonify(amenity.to_dict()), 201
 
 
-@amenity_bp.route('/amenities', methods=['GET'])
+@amenity_blueprint.route('/amenities', methods=['GET'])
 def get_amenities():
     amenities = [amenity.to_dict()
                  for amenity in data_manager.storage.get('Amenity', {}).values()]
     return jsonify(amenities), 200
 
 
-@amenity_bp.route('/amenities/<amenity_id>', methods=['GET'])
+@amenity_blueprint.route('/amenities/<amenity_id>', methods=['GET'])
 def get_amenity(amenity_id):
     amenity = data_manager.get(amenity_id, 'Amenity')
     if not amenity:
@@ -39,7 +39,7 @@ def get_amenity(amenity_id):
     return jsonify(amenity.to_dict()), 200
 
 
-@amenity_bp.route('/amenities/<amenity_id>', methods=['PUT'])
+@amenity_blueprint.route('/amenities/<amenity_id>', methods=['PUT'])
 def update_amenity(amenity_id):
     amenity = data_manager.get(amenity_id, 'Amenity')
     if not amenity:
@@ -60,7 +60,7 @@ def update_amenity(amenity_id):
     return jsonify(amenity.to_dict()), 200
 
 
-@amenity_bp.route('/amenities/<amenity_id>', methods=['DELETE'])
+@amenity_blueprint.route('/amenities/<amenity_id>', methods=['DELETE'])
 def delete_amenity(amenity_id):
     amenity = data_manager.get(amenity_id, 'Amenity')
     if not amenity:

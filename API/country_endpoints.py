@@ -2,17 +2,17 @@ from flask import Blueprint, request, jsonify, abort
 from Model.city import City
 from Persistence.DataManager import DataManager
 
-country_bp = Blueprint('country_bp', __name__,)
+country_blueprint = Blueprint('country_blueprint', __name__,)
 data_manager = DataManager()
 
 
-@country_bp.route('/countries', methods=['GET'])
+@country_blueprint.route('/countries', methods=['GET'])
 def get_countries():
     countries = list(data_manager.storage.get('Country', {}).values())
     return jsonify(countries), 200
 
 
-@country_bp.route('/countries/<country_code>', methods=['GET'])
+@country_blueprint.route('/countries/<country_code>', methods=['GET'])
 def get_country(country_code):
     country = data_manager.get(country_code, 'Country')
     if not country:
@@ -20,7 +20,7 @@ def get_country(country_code):
     return jsonify(country), 200
 
 
-@country_bp.route('/countries/<country_code>/cities', methods=['GET'])
+@country_blueprint.route('/countries/<country_code>/cities', methods=['GET'])
 def get_cities_by_country(country_code):
     if not data_manager.get(country_code, 'Country'):
         abort(404, description="Country not found")
@@ -29,7 +29,7 @@ def get_cities_by_country(country_code):
     return jsonify(cities), 200
 
 
-@country_bp.route('/cities', methods=['POST'])
+@country_blueprint.route('/cities', methods=['POST'])
 def create_city():
     if not request.json or 'name' not in request.json or 'country_code' not in request.json:
         abort(400, "Missing required fields")
@@ -51,14 +51,14 @@ def create_city():
     return jsonify({"city_id": city.id, "city": city.to_dict()}), 201
 
 
-@country_bp.route('/cities', methods=['GET'])
+@country_blueprint.route('/cities', methods=['GET'])
 def get_cities():
     cities = [city.to_dict()
               for city in data_manager.storage.get('City', {}).values()]
     return jsonify(cities), 200
 
 
-@country_bp.route('/cities/<city_id>', methods=['GET'])
+@country_blueprint.route('/cities/<city_id>', methods=['GET'])
 def get_city(city_id):
     city = data_manager.get(city_id, 'City')
     if not city:
@@ -66,7 +66,7 @@ def get_city(city_id):
     return jsonify(city.to_dict()), 200
 
 
-@country_bp.route('/cities/<city_id>', methods=['PUT'])
+@country_blueprint.route('/cities/<city_id>', methods=['PUT'])
 def update_city(city_id):
     city = data_manager.get(city_id, 'City')
     if not city:
@@ -85,7 +85,7 @@ def update_city(city_id):
     return jsonify(city.to_dict()), 200
 
 
-@country_bp.route('/cities/<city_id>', methods=['DELETE'])
+@country_blueprint.route('/cities/<city_id>', methods=['DELETE'])
 def delete_city(city_id):
     city = data_manager.get(city_id, 'City')
     if not city:
