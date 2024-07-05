@@ -3,14 +3,14 @@ from database import db
 
 class Country(BaseModel):
     name = db.Column(db.String(128), nullable=False)
-    code = db.Column(db.String(2), nullable=False)
+    country_code = db.Column(db.String(2), unique=True, nullable=False)
 
     """ Country class that represents a country with a name and an area code. """
-    def __init__(self, name, code, **kwargs):
+    def __init__(self, name, country_code, **kwargs):
         """ Initializes the Country with attributes id, name, and area code. """
         super().__init__(**kwargs)
         self.name = name
-        self.code = code
+        self.country_code = country_code
 
     def __str__(self):
         return f"[Country] ({self.id}) {self.to_dict()}"
@@ -19,7 +19,7 @@ class Country(BaseModel):
         return {
             'id': self.id,
             'name': self.name,
-            'code': self.code,
+            'country_code': self.country_code,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
             }
