@@ -3,23 +3,21 @@ from database import db
 
 class Country(BaseModel):
     name = db.Column(db.String(128), nullable=False)
-    country_code = db.Column(db.String(2), unique=True, nullable=False)
+    code = db.Column(db.String(2), unique=True)
+    cities = db.Relationship('City', backref='country', lazy=True)
 
     """ Country class that represents a country with a name and an area code. """
-    def __init__(self, name, country_code, **kwargs):
+    def __init__(self, name, code, **kwargs):
         """ Initializes the Country with attributes id, name, and area code. """
         super().__init__(**kwargs)
         self.name = name
-        self.country_code = country_code
+        self.code = code
 
     def __str__(self):
         return f"[Country] ({self.id}) {self.to_dict()}"
 
     def to_dict(self):
         return {
-            'id': self.id,
             'name': self.name,
-            'country_code': self.country_code,
-            'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat()
+            'code': self.code
             }

@@ -8,6 +8,26 @@ user_blueprint = Blueprint('user_blueprint', __name__)
 data_manager = DataManager()
 
 
+
+@user_blueprint.route('/login', methods=['POST'])
+def login():
+    if not request.json or 'email' not in request.json or 'password' not in request.json:
+        abort(400, description="Missing required fields")
+
+    email = request.json['email']
+    password = request.json['password']
+
+    user = User.query.filter_by(email=email).first()
+
+    if user is None:
+        abort(401, description="User not found")
+
+    if not user.check_password(password):
+        abort(401, description="Invalid password")
+
+    return jsonify({"message": "login was successful"}), 200
+
+
 @user_blueprint.route('/users', methods=['POST'])
 def create_user():
     if not request.json or 'email' not in request.json or 'password' not in request.json:
