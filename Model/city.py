@@ -1,9 +1,12 @@
 from Model.basemodel import BaseModel
 from database import db
+from Model.country import Country
 
 class City(BaseModel):
     name = db.Column(db.String(128), nullable=False)
-    country_code = db.Column(db.String(2), unique=False)
+    country_code = db.Column(db.String(2), db.ForeignKey('country.code'), nullable=True)
+
+    place = db.relationship('Place', backref='city', lazy=True)
 
     """ City class that inherits from BaseModel """
     def __init__(self, name, country_code, **kwargs):
