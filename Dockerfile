@@ -1,26 +1,29 @@
-# Usa una imagen base de Alpine Linux con Python 3.9
-FROM python:3.9-alpine
+# Use an official Python runtime as a parent image
+FROM python:3.8-alpine
 
-# Establece el directorio de trabajo en /app
+# Set environment variables
+ENV PYTHONUNBUFFERED 1
+
+# Install dependencies
+RUN apk update && \
+	apk add --no-cache postgresql-dev gcc python3-dev musl-dev libffi-dev openssl-dev && \
+	rm -rf /var/cache/apk/*
+
+# Set the working directory
 WORKDIR /app
 
-# Copia el archivo requirements.txt en el directorio de trabajo
-COPY requirements.txt .
+# Copy the requirements file first for caching
+COPY requirements.txt /app/
 
-# Instala las dependencias
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies
+RUN pip install --upgrade pip && \
+	pip install -r requirements.txt
 
-# Copia el resto del código de la aplicación en el directorio de trabajo
-COPY . .
+# Copy the rest of the application code
+COPY . /app
 
-# Establece una variable de entorno para el puerto
-ENV PORT 8000
+# Expose port 5000 for the application
+EXPOSE 5000
 
-# Define un volumen para el almacenamiento persistente
-VOLUME /app/data
-
-# Expone el puerto configurado
-EXPOSE $PORT
-
-# Define el comando para ejecutar Gunicorn
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:$PORT app:app"]
+# Run the application
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]

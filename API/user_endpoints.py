@@ -1,55 +1,58 @@
 from flask import Blueprint, request, jsonify, abort
 from Model.user import User
 from Persistence.DataManager import DataManager
+from database import db
 
 
-user_bp = Blueprint('user_bp', __name__)
+user_blueprint = Blueprint('user_blueprint', __name__)
 data_manager = DataManager()
 
 
-@user_bp.route('/users', methods=['POST'])
+@user_blueprint.route('/users', methods=['POST'])
 def create_user():
-    if not request.json or not 'email' in request.json:
-        abort(400, description="Missing requirement fields")
+    if not request.json or 'email' not in request.json or 'password' not in request.json:
+        abort(400, description="Missing required fields")
 
     email = request.json['email']
-    first_name = request.json.get('first_name', '')
-    last_name = request.json.get('last_name', '')
-
     if '@' not in email:
         abort(400, description="Invalid email format")
 
-    existing_users = [user for user in data_manager.storage.get(
-		'User', {}).values() if user.email == email]
-    if existing_users:
+    if User.query.filter_by(email=email).first():
         abort(409, description="Email already exists")
 
-
-    user = User(email=email, first_name=first_name, last_name=last_name)
-    data_manager.save(user)
+    user = User(
+        email=email,
+        password=request.json['password'],
+        is_admin=request.json.get('is_admin', False),
+        password_hash=request.json.get('password_hash', ''),
+        first_name=request.json.get('first_name', ''),
+        last_name=request.json.get('last_name', '')
+    )
+    db.session.add(user)
+    db.session.commit()
 
     return jsonify(user.to_dict()), 201
 
 
-@user_bp.route('/users', methods=['GET'])
+@user_blueprint.route('/users', methods=['GET'])
 def get_users():
-    users = [user.to_dict()
-             for user in data_manager.storage.get('User', {}).values()]
-    return jsonify(users), 200
+    users = User.query.all()
+    return jsonify([user.to_dict() for user in users]), 200
 
-@user_bp.route('/users/<user_id>', methods=['GET'])
+
+@user_blueprint.route('/users/<user_id>', methods=['GET'])
 def get_user(user_id):
-    user = data_manager.get(user_id, 'User')
+    user = User.query.get(user_id)
     if user is None:
         abort(404, description="User not found")
     return jsonify(user.to_dict()), 200
 
 
-@user_bp.route('/users/<user_id>', methods=['PUT'])
+@user_blueprint.route('/users/<user_id>', methods=['PUT'])
 def update_user(user_id):
-    user = data_manager.get(user_id, 'User')
+    user = User.query.get(user_id)
     if user is None:
-        abort(404, description='User not found')
+        abort(404, description="User not found")
 
     if not request.json:
         abort(400, description="Missing required fields")
@@ -58,14 +61,15 @@ def update_user(user_id):
     user.first_name = request.json.get('first_name', user.first_name)
     user.last_name = request.json.get('last_name', user.last_name)
 
-    data_manager.update(user)
+    db.session.commit()
     return jsonify(user.to_dict()), 200
 
 
-@user_bp.route('/users/<user_id>', methods=['DELETE'])
+@user_blueprint.route('/users/<user_id>', methods=['DELETE'])
 def delete_user(user_id):
-    user = data_manager.get(user_id, 'User')
+    user = User.query.get(user_id)
     if user is None:
         abort(404, description="User not found")
-    data_manager.delete(user_id, 'User')
+    db.session.delete(user)
+    db.session.commit()
     return '', 204

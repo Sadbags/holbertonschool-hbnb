@@ -1,35 +1,39 @@
 from flask import Blueprint, request, jsonify, abort
 from Model.city import City
+from Model.country import Country
 from Persistence.DataManager import DataManager
+from database import db
 
-country_bp = Blueprint('country_bp', __name__,)
+
+country_blueprint = Blueprint('country_blueprint', __name__,)
 data_manager = DataManager()
 
 
-@country_bp.route('/countries', methods=['GET'])
+@country_blueprint.route('/countries', methods=['GET'])
 def get_countries():
-    countries = list(data_manager.storage.get('Country', {}).values())
-    return jsonify(countries), 200
+    countries = Country.query.all()
+    return jsonify([country.to_dict() for country in countries]), 200
 
-
-@country_bp.route('/countries/<country_code>', methods=['GET'])
+# GET a specific country by country code
+@country_blueprint.route('/countries/<country_code>', methods=['GET'])
 def get_country(country_code):
-    country = data_manager.get(country_code, 'Country')
+    country = Country.query.filter_by(country_code=country_code).first()
     if not country:
         abort(404, description="Country not found")
-    return jsonify(country), 200
+    return jsonify(country.to_dict()), 200
 
-
-@country_bp.route('/countries/<country_code>/cities', methods=['GET'])
+# GET cities by country code
+@country_blueprint.route('/countries/<country_code>/cities', methods=['GET'])
 def get_cities_by_country(country_code):
-    if not data_manager.get(country_code, 'Country'):
+    country = Country.query.filter_by(country_code=country_code).first()
+    if not country:
         abort(404, description="Country not found")
-    cities = [city.to_dict() for city in data_manager.storage.get(
-        'City', {}).values() if city.country_code == country_code]
-    return jsonify(cities), 200
 
+    cities = City.query.filter_by(country_code=country_code).all()
+    return jsonify([city.to_dict() for city in cities]), 200
 
-@country_bp.route('/cities', methods=['POST'])
+# POST a new city
+@country_blueprint.route('/cities', methods=['POST'])
 def create_city():
     if not request.json or 'name' not in request.json or 'country_code' not in request.json:
         abort(400, "Missing required fields")
@@ -37,59 +41,62 @@ def create_city():
     name = request.json['name']
     country_code = request.json['country_code']
 
-    if not data_manager.get(country_code, 'Country'):
-        abort(400, "Invalid country code")
-
-    existing_cities = [city for city in data_manager.storage.get('City', {}).values()
-                       if city.name == name and city.country_code == country_code]
-    if existing_cities:
+    existing_city = City.query.filter_by(name=name, country_code=country_code).first()
+    if existing_city:
         abort(409, "City name already exists in this country")
 
     city = City(name=name, country_code=country_code)
-    data_manager.save(city)
+    db.session.add(city)
+    db.session.commit()
 
     return jsonify({"city_id": city.id, "city": city.to_dict()}), 201
 
-
-@country_bp.route('/cities', methods=['GET'])
+# GET all cities
+@country_blueprint.route('/cities', methods=['GET'])
 def get_cities():
-    cities = [city.to_dict()
-              for city in data_manager.storage.get('City', {}).values()]
-    return jsonify(cities), 200
+    cities = City.query.all()
+    return jsonify([city.to_dict() for city in cities]), 200
 
-
-@country_bp.route('/cities/<city_id>', methods=['GET'])
+# GET a specific city by city_id
+@country_blueprint.route('/cities/<city_id>', methods=['GET'])
 def get_city(city_id):
-    city = data_manager.get(city_id, 'City')
+    city = City.query.get(city_id)
     if not city:
         abort(404, description="City not found")
     return jsonify(city.to_dict()), 200
 
-
-@country_bp.route('/cities/<city_id>', methods=['PUT'])
+# PUT update a specific city by city_id
+@country_blueprint.route('/cities/<city_id>', methods=['PUT'])
 def update_city(city_id):
-    city = data_manager.get(city_id, 'City')
+    city = City.query.get(city_id)
     if not city:
         abort(404, description="City not found")
 
     if not request.json:
-        abort(400, description="Missing required fields")
+        abort(400, description="Missing JSON data")
 
-    city.name = request.json.get('name', city.name)
-    city.country_code = request.json.get('country_code', city.country_code)
+    if 'name' in request.json:
+        city.name = request.json['name']
 
-    if not data_manager.get(city.country_code, 'Country'):
-        abort(400, description="Invalid country code")
+    if 'country_code' in request.json:
+        new_country_code = request.json['country_code']
 
-    data_manager.update(city)
+        if not Country.query.filter_by(country_code=new_country_code).first():
+            abort(400, description="Invalid country code")
+
+        city.country_code = new_country_code
+
+    db.session.commit()
+
     return jsonify(city.to_dict()), 200
 
-
-@country_bp.route('/cities/<city_id>', methods=['DELETE'])
+# DELETE a specific city by city_id
+@country_blueprint.route('/cities/<city_id>', methods=['DELETE'])
 def delete_city(city_id):
-    city = data_manager.get(city_id, 'City')
+    city = City.query.get(city_id)
     if not city:
         abort(404, description="City not found")
 
-    data_manager.delete(city_id, 'City')
+    db.session.delete(city)
+    db.session.commit()
     return '', 204

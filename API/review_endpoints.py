@@ -1,12 +1,12 @@
 from flask import Blueprint, request, jsonify, abort
+from database import db
 from Model.review import Review
 from Persistence.DataManager import DataManager
 
-review_bp = Blueprint('review_bp', __name__)
+review_blueprint = Blueprint('review_blueprint', __name__)
 data_manager = DataManager()
 
-
-@review_bp.route('/places/<place_id>/reviews', methods=['POST'])
+@review_blueprint.route('/places/<place_id>/reviews', methods=['POST'])
 def create_review(place_id):
     if not request.json or not all(key in request.json for key in ('user_id', 'rating', 'comment')):
         abort(400, description="Missing required fields")
@@ -18,38 +18,32 @@ def create_review(place_id):
     if not (1 <= rating <= 5):
         abort(400, description="Rating must be between 1 and 5")
 
-    review = Review(place_id=place_id, user_id=user_id,
-                    rating=rating, comment=comment)
-    data_manager.save(review)
+    review = Review(place_id=place_id, user_id=user_id, rating=rating, comment=comment)
+    db.session.add(review)
+    db.session.commit()
 
     return jsonify(review.to_dict()), 201
 
-
-@review_bp.route('/users/<user_id>/reviews', methods=['GET'])
+@review_blueprint.route('/users/<user_id>/reviews', methods=['GET'])
 def get_user_reviews(user_id):
-    reviews = [review.to_dict() for review in data_manager.storage.get(
-        'Review', {}).values() if review.user_id == user_id]
-    return jsonify(reviews), 200
+    reviews = Review.query.filter_by(user_id=user_id).all()
+    return jsonify([review.to_dict() for review in reviews]), 200
 
-
-@review_bp.route('/places/<place_id>/reviews', methods=['GET'])
+@review_blueprint.route('/places/<place_id>/reviews', methods=['GET'])
 def get_place_reviews(place_id):
-    reviews = [review.to_dict() for review in data_manager.storage.get(
-        'Review', {}).values() if review.place_id == place_id]
-    return jsonify(reviews), 200
+    reviews = Review.query.filter_by(place_id=place_id).all()
+    return jsonify([review.to_dict() for review in reviews]), 200
 
-
-@review_bp.route('/reviews/<review_id>', methods=['GET'])
+@review_blueprint.route('/reviews/<review_id>', methods=['GET'])
 def get_review(review_id):
-    review = data_manager.get(review_id, 'Review')
+    review = Review.query.get(review_id)
     if not review:
         abort(404, description="Review not found")
     return jsonify(review.to_dict()), 200
 
-
-@review_bp.route('/reviews/<review_id>', methods=['PUT'])
+@review_blueprint.route('/reviews/<review_id>', methods=['PUT'])
 def update_review(review_id):
-    review = data_manager.get(review_id, 'Review')
+    review = Review.query.get(review_id)
     if not review:
         abort(404, description="Review not found")
 
@@ -62,14 +56,14 @@ def update_review(review_id):
     if not (1 <= review.rating <= 5):
         abort(400, description="Rating must be between 1 and 5")
 
-    data_manager.update(review)
+    db.session.commit()
     return jsonify(review.to_dict()), 200
 
-
-@review_bp.route('/reviews/<review_id>', methods=['DELETE'])
+@review_blueprint.route('/reviews/<review_id>', methods=['DELETE'])
 def delete_review(review_id):
-    review = data_manager.get(review_id, 'Review')
+    review = Review.query.get(review_id)
     if not review:
         abort(404, description="Review not found")
-    data_manager.delete(review_id, 'Review')
+    db.session.delete(review)
+    db.session.commit()
     return '', 204

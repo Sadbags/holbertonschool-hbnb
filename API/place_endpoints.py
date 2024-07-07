@@ -1,13 +1,14 @@
 from flask import Blueprint, request, jsonify, abort
 from Model.place import Place
 from Persistence.DataManager import DataManager
+from database import db
 
 
-place_bp = Blueprint('place_bp', __name__)
+place_blueprint = Blueprint('place_blueprint', __name__)
 data_manager = DataManager()
 
 
-@place_bp.route('/places', methods=['POST'])
+@place_blueprint.route('/places', methods=['POST'])
 def create_place():
     if not request.json:
         abort(400, description="Missing required fields")
@@ -28,28 +29,28 @@ def create_place():
         amenity_ids=data.get('amenity_ids')
     )
 
-    data_manager.save(place)
+    db.session.add(place)
+    db.session.commit()
     return jsonify(place.to_dict()), 201
 
 
-@place_bp.route('/places', methods=['GET'])
+@place_blueprint.route('/places', methods=['GET'])
 def get_places():
-    places = [place.to_dict()
-              for place in data_manager.storage.get('Place', {}).values()]
-    return jsonify(places), 200
+    places = Place.query.all()
+    return jsonify([place.to_dict() for place in places]), 200
 
 
-@place_bp.route('/places/<place_id>', methods=['GET'])
+@place_blueprint.route('/places/<place_id>', methods=['GET'])
 def get_place(place_id):
-    place = data_manager.get(place_id, 'Place')
+    place = Place.query.get(place_id)
     if not place:
         abort(404, description="Place not found")
     return jsonify(place.to_dict()), 200
 
 
-@place_bp.route('/places/<place_id>', methods=['PUT'])
+@place_blueprint.route('/places/<place_id>', methods=['PUT'])
 def update_place(place_id):
-    place = data_manager.get(place_id, 'Place')
+    place = Place.query.get(place_id)
     if not place:
         abort(404, description="Place not found")
 
@@ -60,28 +61,25 @@ def update_place(place_id):
     place.name = data.get('name', place.name)
     place.description = data.get('description', place.description)
     place.address = data.get('address', place.address)
-    if 'city_id' in data:
-        place.city_id = data['city_id']
-        if not data_manager.get(place.city_id, 'City'):
-            abort(400, description="Invalid city_id")
+    place.city_id = data.get('city_id', place.city_id)
     place.latitude = data.get('latitude', place.latitude)
     place.longitude = data.get('longitude', place.longitude)
     place.host_id = data.get('host_id', place.host_id)
     place.number_of_rooms = data.get('number_of_rooms', place.number_of_rooms)
-    place.number_of_bathrooms = data.get(
-        'number_of_bathrooms', place.number_of_bathrooms)
+    place.number_of_bathrooms = data.get('number_of_bathrooms', place.number_of_bathrooms)
     place.price_per_night = data.get('price_per_night', place.price_per_night)
     place.max_guests = data.get('max_guests', place.max_guests)
     place.amenity_ids = data.get('amenity_ids', place.amenity_ids)
 
-    data_manager.update(place)
+    db.session.commit()
     return jsonify(place.to_dict()), 200
 
 
-@place_bp.route('/places/<place_id>', methods=['DELETE'])
+@place_blueprint.route('/places/<place_id>', methods=['DELETE'])
 def delete_place(place_id):
-    place = data_manager.get(place_id, 'Place')
+    place = Place.query.get(place_id)
     if not place:
         abort(404, description="Place not found")
-    data_manager.delete(place_id, 'Place')
+    db.session.delete(place)
+    db.session.commit()
     return '', 204
