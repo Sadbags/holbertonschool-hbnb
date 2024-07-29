@@ -3,7 +3,8 @@ from Model.city import City
 from Model.country import Country
 from Persistence.DataManager import DataManager
 from database import db
-
+from Model.user import User
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 country_blueprint = Blueprint('country_blueprint', __name__,)
 data_manager = DataManager()
@@ -33,7 +34,12 @@ def get_cities_by_country(country_code):
 
 
 @country_blueprint.route('/cities', methods=['POST'])
+@jwt_required()
 def create_city():
+    user = User.query.get(get_jwt_identity())
+    if not user.is_admin:
+        abort(403, description="Admin rights required")
+
     if not request.json or 'name' not in request.json or 'country_code' not in request.json:
         abort(400, "Missing required fields")
 
@@ -89,10 +95,13 @@ def update_city(city_id):
 
 
 @country_blueprint.route('/cities/<city_id>', methods=['DELETE'])
+@jwt_required()
 def delete_city(city_id):
+    user = User.query.get(get_jwt_identity())
+    if not user.is_admin:
+        abort(403, description="Admin rights required")
+
     city = City.query.get(city_id)
-    if not city:
-        abort(404, description="City not found")
     db.session.delete(city)
     db.session.commit()
     return '', 204

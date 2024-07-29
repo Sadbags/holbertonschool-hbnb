@@ -2,36 +2,44 @@ from flask import Blueprint, request, jsonify, abort
 from Model.amenity import Amenity
 from Persistence.DataManager import DataManager
 from database import db
+from Model.user import User
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 amenity_blueprint = Blueprint('amenity_blueprint', __name__)
 data_manager = DataManager()
 
 
-# POST a new amenity
 @amenity_blueprint.route('/amenities', methods=['POST'])
+@jwt_required()
 def create_amenity():
-    if not request.json or 'name' not in request.json:
+    user = User.query.get(get_jwt_identity())
+    if not user.is_admin:
+        abort(403, description="Admin rights required")
+
+    if not request.json or not 'name' in request.json:
         abort(400, description="Missing required fields")
 
     name = request.json['name']
 
-    existing_amenity = Amenity.query.filter_by(name=name).first()
-    if existing_amenity:
+    existing_amenities = Amenity.query.filter_by(name=name).first()
+
+    if existing_amenities:
         abort(409, description="Amenity name already exists")
 
-    amenity = Amenity(name=name)
+    amenity = Amenity(
+        name=name
+    )
     db.session.add(amenity)
     db.session.commit()
-
     return jsonify(amenity.to_dict()), 201
 
-# GET all amenities
+
 @amenity_blueprint.route('/amenities', methods=['GET'])
 def get_amenities():
     amenities = Amenity.query.all()
-    return jsonify([amenity.to_dict() for amenity in amenities]), 200
+    return jsonify([amenities.to_dict() for amenities in amenities]), 200
 
-# GET a specific amenity by amenity_id
+
 @amenity_blueprint.route('/amenities/<amenity_id>', methods=['GET'])
 def get_amenity(amenity_id):
     amenity = Amenity.query.get(amenity_id)
@@ -39,7 +47,7 @@ def get_amenity(amenity_id):
         abort(404, description="Amenity not found")
     return jsonify(amenity.to_dict()), 200
 
-# PUT update a specific amenity by amenity_id
+
 @amenity_blueprint.route('/amenities/<amenity_id>', methods=['PUT'])
 def update_amenity(amenity_id):
     amenity = Amenity.query.get(amenity_id)
@@ -49,25 +57,25 @@ def update_amenity(amenity_id):
     if not request.json:
         abort(400, description="Missing required fields")
 
-    name = request.json.get('name', amenity.name)
+    new_name = request.json.get('name')
+    if new_name and new_name != amenity.name:
+        existing_amenity = Amenity.query.filter(
+            Amenity.name == new_name, Amenity.id != amenity_id).first()
+        if existing_amenity:
+            abort(409, description="Amenity name already exists")
+        amenity.name = new_name
 
-    existing_amenity = Amenity.query.filter(Amenity.name == name, Amenity.id != amenity_id).first()
-    if existing_amenity:
-        abort(409, description="Amenity name already exists")
-
-    amenity.name = name
     db.session.commit()
-
     return jsonify(amenity.to_dict()), 200
 
-# DELETE a specific amenity by amenity_id
-@amenity_blueprint.route('/amenities/<amenity_id>', methods=['DELETE'])
-def delete_amenity(amenity_id):
-    amenity = Amenity.query.get(amenity_id)
-    if not amenity:
-        abort(404, description="Amenity not found")
 
+@amenity_blueprint.route('/amenities/<amenity_id>', methods=['DELETE'])
+@jwt_required()
+def delete_amenity(amenity_id):
+    user = User.query.get(get_jwt_identity())
+    if not user.is_admin:
+        abort(403, description="Admin rights required")
+    amenity = Amenity.query.get(amenity_id)
     db.session.delete(amenity)
     db.session.commit()
-
     return '', 204

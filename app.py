@@ -7,6 +7,7 @@ from API.place_endpoints import place_blueprint
 from API.review_endpoints import review_blueprint
 from API.amenity_endpoints import amenity_blueprint
 from API.country_endpoints import country_blueprint
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 
@@ -26,9 +27,7 @@ class ProductionConfig(Config):
 
 environment_config = DevelopmentConfig if os.environ.get(
     'ENV') == 'development' else ProductionConfig
-
 app.config.from_object(environment_config)
-
 
 db.init_app(app)
 jwt = JWTManager(app)
@@ -36,7 +35,7 @@ jwt = JWTManager(app)
 
 @app.route('/')
 def home():
-    return 'Welcome to api'
+    return 'Hello, API'
 
 
 app.register_blueprint(user_blueprint)
@@ -48,6 +47,5 @@ app.register_blueprint(review_blueprint)
 with app.app_context():
     db.create_all()
 
-print(f"USE_DATABASE: {os.getenv('USE_DATABASE')}")
 if __name__ == "__main__":
     app.run(debug=True)
