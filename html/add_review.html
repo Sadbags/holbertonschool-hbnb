@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Review</title>
+    <link rel="stylesheet" href="styles.css">
+	<link rel="shortcut icon" href="imgs/SH.png" type="image/x-SH">
+</head>
+<body>
+	<header>
+		<a href="index.html" class="login-button">
+			<button>Back</button>
+		</a>
+
+		<a href="index.html">
+			<img src="imgs/SH.png" alt="logo" class="logo">
+		</a>
+		<nav>
+			<a href="login.html" class="login-button">
+				<p>Not logged in?</p>
+				<button>Login</button>
+			</a>
+        </nav>
+
+	</header>
+    <main>
+        <form id="review-form">
+            <h2>Your Review</h2>
+            <label for="place">Place:</label>
+			<textarea id="place" name="place" required></textarea>
+
+            <label for="review">Review:</label>
+            <textarea id="review" name="review" required></textarea>
+
+            <button type="submit">Submit</button>
+        </form>
+    </main>
+	<footer>
+        <p>©️ 2024 Hbnb Evolution All rights reserved</p>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
+</html>

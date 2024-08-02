@@ -1,0 +1,457 @@
+/* Reset de márgenes y padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilo general para el body */
+html, body {
+    font-family: "Helvetica Neue", sans-serif;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+body {
+	background-image: url('imgs/palms.png');
+	background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+
+}
+
+body.place {
+	background-image: url('imgs/boat.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+body.place2 {
+	background-image: url('imgs/TFP.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+body.place3 {
+	background-image: url('imgs/LAS.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+h1 {
+    margin: 3.5rem;
+    text-align: center;
+    color: #000000;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+/* Estilo para encabezados secundarios (h2) */
+h2 {
+    font-size: 30px;
+    margin-bottom: 10px;
+    margin-top: 40px; /* Separación superior para h2 */
+}
+
+header {
+    background-color: #7c26d3;
+	font-style: italic;
+	font-family: "Helvetica Neue", sans-serif;
+    position: fixed;
+    width: 100%;
+    padding: 10px 20px;
+    z-index: 1000;
+    display: flex;
+	text-align: center;
+    align-items: center; /* Centra el contenido verticalmente */
+    justify-content: space-between; /* Distribuye el espacio entre el logo y el botón */
+}
+
+footer {
+    position: fixed;
+    margin: 0;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    width: 100%;
+    height: 0px;
+    justify-content: center;
+    align-items: center;
+    filter: drop-shadow(0 0 0.4rem rgb(255, 255, 255));
+    bottom: 0px;
+    height: 50px;
+    display: flex;
+	background-color: #7c26d3;
+}
+
+/* Estilo para el logo en el header */
+header .logo {
+    width: 75px;
+    height: auto;
+    margin-right: 10px;
+    background-color: #953232;
+    border-radius: 60px;
+}
+
+
+/* Estilo para el contenido del header */
+.header-content {
+    display: flex;
+    align-items: center;
+}
+
+/* maneja contenido del logo */
+.header-content .logo {
+    width: 35px;
+    height: auto;
+}
+
+/* Estilo para el texto del header */
+.header-text-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    color: #7b2222;
+    margin-left: 10px; /* Espacio entre el logo y el texto */
+}
+
+/* Estilo para el texto dentro del header */
+.header-text {
+    font-size: 2.8rem;
+    font-weight: bold;
+    font-family: "Helvetica Neue", sans-serif;
+    line-height: 1.5;
+    color: #ffffff;
+}
+
+/* color del texto del logo */
+#logo-text {
+    color: #ffffff;
+    font-size: 1.6rem;
+}
+
+/* Estilo para el footer */
+footer p {
+    margin: 0;
+    text-align: center;
+	color: #fcf9f9;
+}
+
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 180px;
+    padding-bottom: 60px;
+    text-align: center;
+}
+
+nav {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+#filter {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#filter label {
+    font-weight: bold;
+}
+
+#filter select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#country-filter {
+    padding: 10px;
+    background-color: #007BFF;
+    color: rgb(254, 251, 251);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    filter: drop-shadow(0 0 0.9rem rgb(135, 134, 134));
+}
+
+#login-form {
+    border: 30px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    padding: 15px;
+    margin: 40px;
+    filter: drop-shadow(0 0 0.9rem rgb(121, 121, 121));
+}
+
+#login-form label {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+h2 {
+    size-adjust: 30px;
+    font-size: 30px;
+}
+
+.login-container label {
+    font-weight: bold;
+}
+
+#login-form input {
+    padding: 10px;
+    margin: 20px;
+    width: 60%;
+    border: 1.5px solid #010000;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#login-form button {
+    padding: 10px 20px;
+    margin: 20px;
+    background-color: #007BFF;
+    color: rgb(255, 255, 255);
+    border: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    height: 50px;
+    width: 60%
+}
+
+.login-container button:hover {
+    background-color: antiquewhite;
+}
+
+.places-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.place-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    filter: drop-shadow(0 0 0.4rem rgba(0, 0, 0, 0.794));
+    max-width: 300px;
+    width: 100%;
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+	background-color: #ffffff;
+}
+
+.place-card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.place-card form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.place-card label {
+    font-weight: bold;
+}
+
+.place-card input {
+    padding: 10px;
+    border: 1px solid #ffffff;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.place-card, .review-card {
+    border: 0.5px solid #000000;
+    border-radius: 20px;
+    margin: 40px;
+    padding: 30px;
+    width: 300px;
+
+}
+
+.place-info img {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    border: 5px solid #dfd4d4;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+/* Estilo para la caja de contenido */
+.content-box {
+    max-width: 800px;
+    width: 100%;
+    padding: 15px;
+    margin: 20px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Estilo para detalles del lugar */
+.place-detail, #reviews, #add-review {
+    border: 1px solid #ddd; /* Asegúrate de que el borde esté en las cajas */
+    border-radius: 10px;
+    padding: 20px; /* Ajuste del padding para uniformidad */
+    margin: 20px auto;
+    width: 100%; /* Ancho completo */
+    max-width: 800px; /* Asegura que no se expanda demasiado en pantallas grandes */
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Estilo para los párrafos dentro de los detalles del lugar */
+.place-detail h, .place-detail p {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+#reviews-table {
+    width: 100%;
+    border-collapse: collapse;
+    padding: 1px;
+    margin-top: 20px;
+    display: flex;
+}
+
+#add-review {
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#add-review h2 {
+    margin-bottom: 20px;
+}
+
+#add-review form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#add-review label {
+    font-weight: bold;
+}
+
+#add-review textarea, #add-review select {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 15px;
+    font-size: 13px;
+    margin: 0px;
+}
+
+#add-review textarea {
+    height: 35.5px;
+    margin-bottom: 10px;
+    resize: none;
+}
+
+#add-review button {
+    padding: 10px;
+    background-color: #007BFF;
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#add-review button:hover {
+    background-color: #0056b3;
+}
+
+#Rating {
+    border: 30px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    padding: 20px;
+    margin: 40px;
+    filter: drop-shadow(0 0 0.9rem rgb(255, 255, 255));
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#Rating h2 {
+    margin-bottom: 20px;
+}
+
+#Rating p {
+    font-size: 16px;
+}
+
+.place-image, .place-image-large {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.place-card .button {
+    padding: 10px;
+    background-color: #007BFF;
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.place-card .button:hover {
+    background-color: #0056b3;
+}
+
+.login-form, .add-review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 300px;
+    margin: auto;
+}
+
+/* brega con boton de login de mano derecha */
+button {
+    padding: 10px;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
