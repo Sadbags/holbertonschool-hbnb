@@ -96,11 +96,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	  placeElement.innerHTML = `
 		  <div class="place-card">
 			<div class="place-image">
-			  <img src="${place.img_url}" alt="${place.name}">
-			  <h2>${place.name}</h2>
-			  <p>Price per night: <span>$${place.price_per_night}</span></p>
-			  <p>Location: <span>${place.location}</span></p>
-			  <div class="details-button">
+            <img src="${place.img_url}" alt="${place.name}">
+            <h2>${place.name}</h2>
+            <p>Price per night: <span>${place.price_per_night}</span></p>
+            <p>Location: <span>${place.location}</span></p>
+            <div class="details-button">
 				<a href="place.html?placeId=${place.id}">
 				  <button>View Details</button>
 				</a>
@@ -167,27 +167,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Mostrar los detalles del lugar en el DOM
+
   function displayPlaceDetails(place) {
-	const placeDetails = document.getElementById("place-details");
-	placeDetails.innerHTML = `
-		  <section id="place-details">
-		  			<h1>${place.name}</h1>
-					  <div class="place-details">
-					  	<div class="place-info">
-						  <img src="${place.img_url}" alt="${place.name}">
-							<p>Host: <span>${place.max_guests}</span></p>
-							<p>Price: <span>${place.price_per_night}</span></p>
-							<p>Locations: <span>${place.location}</span></p>
-							<p>Amenities: <span>${place.amenity}</span></p>
-							<p>Description: <span>${place.description}</span></p>
-						</div>
-					  </div>
-					  <h2>Reviews</h2>
-					  <div class="place-image-large"></div>
-					  <div class="place-info"></div>
-				  </section>
-			  `;
-  }
+    console.log(place);  // Depuración: Verifica el contenido del objeto 'place'
+    const placeDetails = document.getElementById("place-details");
+    placeDetails.innerHTML = `
+        <h1>${place.name}</h1>
+        <div class="place-info">
+            <img src="${place.img_url}" alt="${place.name}">
+            <p><b>Host:</b> <span>${place.Host}</span></p>
+            <p><b>Max Guests:</b> <span>${place.max_guests}</span></p>
+            <p><b>Price per night:</b> <span>${place.price_per_night}</span></p>
+            <p><b>Location:</b> <span>${place.location}</span></p>
+            <p><b>Amenities:</b> <span>${place.amenity}</span></p>
+            <p><b>Description:</b> <span>${place.description}</span></p>
+        </div>
+    `;
+}
+
 
   document.addEventListener("DOMContentLoaded", () => {
 	handleLoginForm();

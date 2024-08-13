@@ -30,11 +30,15 @@ def create_place():
         latitude=request.json.get('latitude', ''),
         longitude=request.json.get('longitude', ''),
         host_id=request.json.get('host_id', ''),
+        Host=request.json.get('host', ''),
         number_of_rooms=request.json.get('number_of_rooms', ''),
         number_of_bathrooms=request.json.get('number_of_bathrooms', ''),
         price_per_night=request.json.get('price_per_night', ''),
         max_guests=request.json.get('max_guests', ''),
-        amenity_ids=request.json.get('amenity_ids', '')
+        amenity_ids=request.json.get('amenity_ids', ''),
+        location=request.json.get('locations', ''),
+        img_url=request.json.get('img_url', ''),
+        amenity=request.json.get('amenity', '')
     )
     db.session.add(place)
     db.session.commit()

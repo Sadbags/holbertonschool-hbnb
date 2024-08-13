@@ -46,7 +46,7 @@ def login():
 
 
 @ user_blueprint.route('/users', methods=['POST'])
-@ jwt_required()
+@jwt_required()
 def create_user():
     claims = get_jwt_identity()
     if not claims.get('is_admin'):
@@ -88,11 +88,11 @@ def get_users():
 
 
 @ user_blueprint.route('/users/<user_id>', methods=['GET'])
-# @jwt_required()
+@jwt_required()
 def get_user(user_id):
-    # claims = get_jwt_identity()
-    # if not claims.get('is_admin'):
-    # abort(403, description="Admin rights required")
+    claims = get_jwt_identity()
+    if not claims.get('is_admin'):
+      abort(403, description="Admin rights required")
 
     user = User.query.get(user_id)
     if user is None:

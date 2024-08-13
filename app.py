@@ -8,8 +8,10 @@ from API.review_endpoints import review_blueprint
 from API.amenity_endpoints import amenity_blueprint
 from API.country_endpoints import country_blueprint
 from flask_migrate import Migrate
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 
 class Config(object):

@@ -60,15 +60,16 @@ def get_review(review_id):
 @jwt_required()
 def update_review(review_id):
     user = User.query.get(get_jwt_identity())
-    if not user.id == Review.query.get(review_id).user_id:
-        abort(403, description="not owner user to edit")
-
     review = Review.query.get(review_id)
-    if not review:
+
+    if review is None:
         abort(404, description="Review not found")
 
-    if not request.json:
-        abort(400, description="Missing required fields")
+    if user is None:
+        abort(401, description="User not found")
+
+    if not user.id == review.user:
+        abort(403, description="Not authorized to edit this review")
 
     review.rating = request.json.get('rating', review.rating)
     review.comment = request.json.get('comment', review.comment)
